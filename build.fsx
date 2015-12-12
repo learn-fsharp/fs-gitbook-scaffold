@@ -6,12 +6,14 @@ open System.IO
 open System.Diagnostics
 System.Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
+
 let run' cmd args dir =
     let pinfo = ProcessStartInfo(cmd,args)
     pinfo.WorkingDirectory <- if String.IsNullOrEmpty dir then Environment.CurrentDirectory else dir 
     pinfo.UseShellExecute <- false; pinfo.RedirectStandardOutput <- true
     let proc = Process.Start(pinfo)
     proc.StandardOutput.ReadToEnd() |> printfn "< %s >\n\n%s" cmd; proc.WaitForExit()
+
 
 if (not<<File.Exists) ".paket\paket.exe" then
     run' @".paket\paket.bootstrapper.exe" "" ""
@@ -28,23 +30,22 @@ open Fake
 
 
 let npm args    = run' @"packages\Npm.js\tools\npm.cmd" args "" 
-//let nodejs args = run' @"packages\Node.js\content\.bin\node.cmd" args "" 
+let gitbook args = run' @"node_modules\.bin\gitbook.cmd" args ""
 
 
 Target "SetupBook" (fun _ ->
     ensureDirectory "node_modules"
 
-    trace "Installing node package `gitbook-cli` globally"
-    npm "install gitbook-cli -g"
+    trace "Installing node package `gitbook-cli`"
+    npm "install gitbook-cli"
 
     trace "Initializing new gitbook"
-    run' "gitbook.cmd" "init" "." 
-    
+    gitbook "init"     
 )
 
 Target "GitbookPlugins" ( fun _ ->
     trace "Installing plugins from `book.json` "
-    run' "gitbook.cmd" "install" ""
+    gitbook "install"
 )
 
 Target "SnipGen" (fun _ ->
@@ -53,7 +54,7 @@ Target "SnipGen" (fun _ ->
 )
 
 Target "BuildBook" (fun _ ->
-    run' "gitbook.cmd" "build" ""
+    gitbook "build"
 )
 
 
