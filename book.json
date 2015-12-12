@@ -1,0 +1,22 @@
+{
+    "structure":{
+        "readme": "README.md"
+    },
+    
+    "plugins": [
+        "addcssjs"
+    ],
+    
+    "pluginsConfig": {
+        "addcssjs": {
+            "js": [  
+                "fs-formatting/fs-tips.js"
+            ],
+            "css":[
+                "fs-formatting/fs-style.css"
+            ]
+        }
+    }
+    
+    
+}
